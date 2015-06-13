@@ -84,11 +84,12 @@
             (let [basic (base64/encode "CPocl5egXH1XQwV4XFGb5KGAVI5XihrmNC9ZKMm3Dyjc:Sl7mrzkzYprH7D5gdxiKyVMtyKF_xEtIOBsVsZ4VqbZ0")
                   r {:form-params {"grant_type" "authorization_code"
                                    "code"       code}
-                     ;:debug true
-                     ;:debug-body true
+                     :debug true
+                     :debug-body true
                      :headers     {"Authorization: Basic" basic
                                    "username"             "CPocl5egXH1XQwV4XFGb5KGAVI5XihrmNC9ZKMm3Dyjc"
-                                   "password"             "Sl7mrzkzYprH7D5gdxiKyVMtyKF_xEtIOBsVsZ4VqbZ0"}}
+                                   "password"             "Sl7mrzkzYprH7D5gdxiKyVMtyKF_xEtIOBsVsZ4VqbZ0"
+                                   }}
                   v (-> (client/post "https://api.figo.me/auth/token" r)
                         (:body)
                         (json/read-str :key-fn keyword))]

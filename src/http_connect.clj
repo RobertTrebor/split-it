@@ -1,6 +1,7 @@
  (ns http-connect
    (:require [clj-http.client :as client]
-             [clojure.data.json :as json]))
+             [clojure.data.json :as json]
+             [base64-clj.core :as base64]))
 
 
 (comment
@@ -67,17 +68,24 @@
 
 
 
-  (let [r {:form-params {"grant_type" "authorization_code"
-                         "code" code}
-           :basic-auth ["user" "pass"]
-           :accept       :json}
+  (let [basic (base64/encode "CPocl5egXH1XQwV4XFGb5KGAVI5XihrmNC9ZKMm3Dyjc:Sl7mrzkzYprH7D5gdxiKyVMtyKF_xEtIOBsVsZ4VqbZ0")
+        r {:form-params {
+                         "grant_type" "password"
+                         "username" "mamuninfo@gmail.com"
+                         "password" "letmein"
+                         }
+           :debug true
+           :debug-body true
+           :headers {"Authorization: Basic " basic}
+           ;:accept       :json
+           }
         v (-> (client/post "https://api.figo.me/auth/token" r)
               (:body)
               (json/read-str :key-fn keyword)
-              (resp/response))]
-    (log/info "After get authentication key ")
-    (log/info v )
-    (resp/response v))
+              )]
+    (clojure.pprint/pprint v)
+
+    )
 
 
 
