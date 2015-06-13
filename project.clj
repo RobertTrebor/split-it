@@ -39,7 +39,7 @@
             :codox        {:sources    ["src"]
                            :output-dir "doc/api"}
 
-            :repl-options {:port 4555}
+ ;           :repl-options {:port 4555}
             :resource-paths ["web/resources/"
                              "resources"]
             :uberjar-name "split.jar"
