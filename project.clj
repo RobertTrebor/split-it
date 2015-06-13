@@ -34,17 +34,23 @@
                                [com.h2database/h2 "1.3.154"]])
 
             :plugins      [[lein-midje "3.0.0"]
-                           [codox "0.6.4"]]
+                           [codox "0.6.4"]
+                           [lein-immutant "2.0.0-alpha1"]]
             :codox        {:sources    ["src"]
                            :output-dir "doc/api"}
 
             :repl-options {:port 4555}
             :resource-paths ["web/resources/"
                              "resources"]
+            :uberjar-name "split.jar"
+            :main main
             :profiles {
                        ;Example with immutant
 
-                       :profiles {:uberjar {:main main, :aot :all}}
+                       :profiles {:uberjar {:main main,
+                                            :aot :all,
+
+                                            }}
 
                        :dev        {:resource-paths ["web/resources/"
                                                      "resources"]

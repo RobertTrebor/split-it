@@ -84,6 +84,15 @@
            :headers {"Location" "/index"}
            :body    ""
            :session session})))
+    (GET "/login" [:as {:keys [context params session]}]
+      (let [{access_token :access_token :as v} (figo/get-default-token)
+            session (-> session
+                        (assoc :figo-access-token v)
+                        (assoc :figo-session (figo/make-session access_token)))]
+        (log/info session)
+        {:body    session
+         :session session}))
+
     (GET "/index" [:as {:keys [context params session]}]
       (do
         (log/info session)
@@ -102,20 +111,13 @@
                   (figo/get-accounts))]
         (resp/response d)))
 
-;    for (Transaction transaction : session.getTransactions(session.getAccount("A1.2"))) {
- ;           System.out.println(transaction.getPurposeText());
-
-    (GET "/transaction" [accountId :as {:keys [session]}]
-      (let [d (->> session
+    (GET "/transaction/:accountId" [accountId :as {:keys [session]}]
+      (let [d (-> session
                   (:figo-session)
                   (figo/get-transaction accountId))]
         (resp/response d)))
 
-
-
     (context "/query" [] (query-routes tie db))
-;    (context "/department" [] (department-routes tie db))
-
 
     (context "/status" [] (resp/response "Not implemented yet" ))
     (GET "/qrcode" [value] (qr/qr-response value))
