@@ -6,14 +6,12 @@
                    [org.clojure/java.jdbc "0.3.6"]
                    [c3p0/c3p0 "0.9.1.2"]])
 
-(defproject app2 "0.1.5"
+(defproject split "0.1.5"
             :description "Clojure database access framework"
             :url "https://github.com/Mamun/sql-tie"
             :license {:alias "Eclipse Public License"
                       :url   "http://www.eclipse.org/legal/epl-v10.html"}
-            :source-paths ["src"
-                           "module/tie/src/clj"]
-            :test-paths ["test"]
+
             :dependencies ~(concat
                              common-deps
                              '[[ring "1.3.2"]
@@ -40,6 +38,9 @@
                            :output-dir "doc/api"}
 
  ;           :repl-options {:port 4555}
+            :source-paths ["src"
+                           "module/tie/src/clj"]
+            :test-paths ["test"]
             :resource-paths ["web/resources/"
                              "resources"]
             :uberjar-name "split.jar"
@@ -47,10 +48,7 @@
             :profiles {
                        ;Example with immutant
 
-                       :profiles {:uberjar {:main main,
-                                            :aot :all,
-
-                                            }}
+                       :uberjar {:main main :aot :all }
 
                        :dev        {:resource-paths ["web/resources/"
                                                      "resources"]

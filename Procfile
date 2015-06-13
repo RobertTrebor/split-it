@@ -1,1 +1,1 @@
-web: lein run -m main 3000
+web: java $JVM_OPTS -cp target/split.jar clojure.main -m main 3000
