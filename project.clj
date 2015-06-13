@@ -48,7 +48,7 @@
             :profiles {
                        ;Example with immutant
 
-                       :uberjar {:main main :aot :all }
+                       ;:uberjar {:main main :aot :all }
 
                        :dev        {:resource-paths ["web/resources/"
                                                      "resources"]

@@ -1,1 +1,1 @@
-web: java $JVM_OPTS -cp target/split.jar  main 3000
+web: java $JVM_OPTS -cp target/split.jar clojure.main -m main
