@@ -5,6 +5,7 @@
             [ring.middleware.format-response :as fr]
             [ring.util.response :as resp]
             [ring.middleware.resource :as res]
+            [ring.middleware.session :as sess]
             [compojure.route :as route]
             [compojure.handler :as handler]
             [clojure.tools.logging :as log]
@@ -70,39 +71,54 @@
 
 
 
+(comment
+  basic (base64/encode "CPocl5egXH1XQwV4XFGb5KGAVI5XihrmNC9ZKMm3Dyjc:Sl7mrzkzYprH7D5gdxiKyVMtyKF_xEtIOBsVsZ4VqbZ0")
+  r {:form-params {"grant_type" "authorization_code"
+                   "code"       code}
+     :headers     {"Authorization: Basic " basic
+                   "username"             "CPocl5egXH1XQwV4XFGb5KGAVI5XihrmNC9ZKMm3Dyjc"
+                   "password"             "Sl7mrzkzYprH7D5gdxiKyVMtyKF_xEtIOBsVsZ4VqbZ0"
+                   }}
+  )
+
+(defn call-figo [code]
+  (try
+    (let [basic (base64/encode "CPocl5egXH1XQwV4XFGb5KGAVI5XihrmNC9ZKMm3Dyjc:Sl7mrzkzYprH7D5gdxiKyVMtyKF_xEtIOBsVsZ4VqbZ0")
+          r {:form-params {"grant_type" "authorization_code"
+                           "code"       code}
+             :headers     {"Authorization: Basic " basic
+                           "username"             "CPocl5egXH1XQwV4XFGb5KGAVI5XihrmNC9ZKMm3Dyjc"
+                           "password"             "Sl7mrzkzYprH7D5gdxiKyVMtyKF_xEtIOBsVsZ4VqbZ0"
+                           }}
+          v (-> (client/post "https://api.figo.me/auth/token" r)
+                (:body)
+                (json/read-str :key-fn keyword))]
+      (clojure.pprint/pprint "Figo return..........."  v)
+      v)
+    (catch Exception e
+      (log/error e "System got Exception"))))
+
+
 
 (defn main-routes [tie db]
   (routes
-    (GET "/" [state code :as {:keys [params]} ]
-      (if (nil? code)
-        (resp/response "access fail")
-        (do
-          (log/info "code= " code)
-          ;(log/info "state=" state)
-          (log/info "Callback return.... " params)
-          (try
-            (let [basic (base64/encode "CPocl5egXH1XQwV4XFGb5KGAVI5XihrmNC9ZKMm3Dyjc:Sl7mrzkzYprH7D5gdxiKyVMtyKF_xEtIOBsVsZ4VqbZ0")
-                  r {:form-params {"grant_type" "authorization_code"
-                                   "code"       code}
-                     :debug true
-                     :debug-body true
-                     :headers     {"Authorization: Basic" basic
-                                   "username"             "CPocl5egXH1XQwV4XFGb5KGAVI5XihrmNC9ZKMm3Dyjc"
-                                   "password"             "Sl7mrzkzYprH7D5gdxiKyVMtyKF_xEtIOBsVsZ4VqbZ0"
-                                   }}
-                  v (-> (client/post "https://api.figo.me/auth/token" r)
-                        (:body)
-                        (json/read-str :key-fn keyword))]
-              (log/info "After get authentication key......... " v)
-              (resp/response v))
-            (catch Exception e
-              ;(clojure.pprint/pprint (.getMessage e))
-              (log/error e "System got Exception")
-              (resp/response "execption"))))))
-    (GET "/index" [:as {:keys [context params]}]
+    (GET "/" [state code :as req ]
+      (log/info "Main route......." req)
+      (let [{:keys [context params session]} req ]
+        (log/info "----------------------")
+        (if (nil? code)
+          (resp/response "access fail")
+          (let [v (call-figo code)
+                session (assoc session :figo v)]
+            (-> req
+                (assoc :session  session)
+                (resp/response))))))
+    (GET "/index" [:as {:keys [context params ]}]
       (do
         (log/info "/" params)
         (resp/redirect (str context "/index.html"))))
+    (GET "/sess" [:as {:keys [session]}]
+      (resp/response session))
     (context "/query" [] (query-routes tie db))
     (context "/department" [] (department-routes tie db))
     (context "/status" [] (resp/response "Not implemented yet" ))
@@ -124,6 +140,7 @@
               ;(res/wrap-resource "public")
               (m/wrap-request-log)
               (p/wrap-params)
+              (sess/wrap-session )
               (fp/wrap-restful-params)
               (fr/wrap-restful-response)
               (m/wrap-exceptions)
