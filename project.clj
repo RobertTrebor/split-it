@@ -28,7 +28,9 @@
                                [potemkin "0.3.11"]
                                [clj-http "1.1.2"]
                                [org.clojure/data.json "0.2.6"]
-                               [ch.qos.logback/logback-classic "1.0.9"]])
+                               [ch.qos.logback/logback-classic "1.0.9"]
+                               [base64-clj "0.1.1"]
+                               ])
 
             :plugins      [[lein-midje "3.0.0"]
                            [codox "0.6.4"]]

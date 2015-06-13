@@ -27,3 +27,16 @@ notifying browser that file changed:  /hello_world/core.js
 [0mCompiling "resources/public/js/compiled/hello_world.js" from ["src"]...
 [32mSuccessfully compiled "resources/public/js/compiled/hello_world.js" in 0.416 seconds.[0m
 notifying browser that file changed:  /hello_world/core.js
+Figwheel: focusing on build-ids (dev)
+[0mCompiling "resources/public/js/compiled/hello_world.js" from ["src"]...
+[32mSuccessfully compiled "resources/public/js/compiled/hello_world.js" in 0.506 seconds.[0m
+notifying browser that file changed:  resources/public/js/compiled/out/goog/deps.js
+notifying browser that file changed:  resources/public/js/compiled/out/cljs_deps.js
+notifying browser that file changed:  /hello_world/core.js
+[0mCompiling "resources/public/js/compiled/hello_world.js" from ["src"]...
+[32mSuccessfully compiled "resources/public/js/compiled/hello_world.js" in 0.764 seconds.[0m
+notifying browser that file changed:  resources/public/js/compiled/out/cljs_deps.js
+notifying browser that file changed:  /hello_world/core.js
+[0mCompiling "resources/public/js/compiled/hello_world.js" from ["src"]...
+[32mSuccessfully compiled "resources/public/js/compiled/hello_world.js" in 0.37 seconds.[0m
+notifying browser that file changed:  /hello_world/core.js

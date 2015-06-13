@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="Leiningen: net.glxn.qrgen/javase:2.0">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/net/glxn/qrgen/javase/2.0/javase-2.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

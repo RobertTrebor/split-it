@@ -59,7 +59,7 @@
       [:div
        [:h1 "Conenct"]
        [:h1
-        [:a {:href  "https://api.figo.me/auth/code?response_type=code&client_id=CaESKmC8MAhNpDe5rvmWnSkRE_7pkkVIIgMwclgzGcQY&scope=accounts%3Dro+balance%3Dro+transactions%3Dro&state=xqD6gjWygsBlF0uB"}
+        [:a {:href  "https://api.figo.me/auth/code?response_type=code&client_id=CPocl5egXH1XQwV4XFGb5KGAVI5XihrmNC9ZKMm3Dyjc&state=123"}
          "Connect Figo"]]])
 
 

@@ -10,19 +10,19 @@ if(typeof hello_world.core.app_state !== 'undefined'){
 } else {
 hello_world.core.app_state = reagent.core.atom.call(null,new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword(null,"text","text",-1790561697),"Hello world!"], null));
 }
-hello_world.core.handler = (function hello_world$core$handler(p__22148){
-var vec__22150 = p__22148;
-var response = cljs.core.nth.call(null,vec__22150,(0),null);
-var error = cljs.core.nth.call(null,vec__22150,(1),null);
+hello_world.core.handler = (function hello_world$core$handler(p__24771){
+var vec__24773 = p__24771;
+var response = cljs.core.nth.call(null,vec__24773,(0),null);
+var error = cljs.core.nth.call(null,vec__24773,(1),null);
 cljs.core.reset_BANG_.call(null,hello_world.core.app_state,response);
 
 return console.log([cljs.core.str(response)].join(''));
 });
-hello_world.core.error_handler = (function hello_world$core$error_handler(p__22151){
-var map__22153 = p__22151;
-var map__22153__$1 = ((cljs.core.seq_QMARK_.call(null,map__22153))?cljs.core.apply.call(null,cljs.core.hash_map,map__22153):map__22153);
-var status_text = cljs.core.get.call(null,map__22153__$1,new cljs.core.Keyword(null,"status-text","status-text",-1834235478));
-var status = cljs.core.get.call(null,map__22153__$1,new cljs.core.Keyword(null,"status","status",-1997798413));
+hello_world.core.error_handler = (function hello_world$core$error_handler(p__24774){
+var map__24776 = p__24774;
+var map__24776__$1 = ((cljs.core.seq_QMARK_.call(null,map__24776))?cljs.core.apply.call(null,cljs.core.hash_map,map__24776):map__24776);
+var status_text = cljs.core.get.call(null,map__24776__$1,new cljs.core.Keyword(null,"status-text","status-text",-1834235478));
+var status = cljs.core.get.call(null,map__24776__$1,new cljs.core.Keyword(null,"status","status",-1997798413));
 return console.log([cljs.core.str("something bad happened: "),cljs.core.str(status),cljs.core.str(" "),cljs.core.str(status_text)].join(''));
 });
 hello_world.core.query = (function hello_world$core$query(name,params){
@@ -39,7 +39,7 @@ return hello_world.core.query.call(null,new cljs.core.Keyword(null,"get-dept-lis
 }),new cljs.core.Keyword(null,"error-handler","error-handler",-484945776),hello_world.core.error_handler], null));
 });
 hello_world.core.connect_figo = (function hello_world$core$connect_figo(){
-return new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null,"div","div",1057191632),new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null,"h1","h1",-1896887462),"Conenct"], null),new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null,"h1","h1",-1896887462),new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null,"a","a",-2123407586),new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword(null,"href","href",-793805698),"https://api.figo.me/auth/code?response_type=code&client_id=CaESKmC8MAhNpDe5rvmWnSkRE_7pkkVIIgMwclgzGcQY&scope=accounts%3Dro+balance%3Dro+transactions%3Dro&state=xqD6gjWygsBlF0uB"], null),"Connect Figo"], null)], null)], null);
+return new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null,"div","div",1057191632),new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null,"h1","h1",-1896887462),"Conenct"], null),new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null,"h1","h1",-1896887462),new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null,"a","a",-2123407586),new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword(null,"href","href",-793805698),"https://api.figo.me/auth/code?response_type=code&client_id=CPocl5egXH1XQwV4XFGb5KGAVI5XihrmNC9ZKMm3Dyjc&state=123"], null),"Connect Figo"], null)], null)], null);
 });
 hello_world.core.form = (function hello_world$core$form(){
 var doc = reagent.core.atom.call(null,cljs.core.PersistentArrayMap.EMPTY);
@@ -65,4 +65,4 @@ return new cljs.core.PersistentVector(null, 5, 5, cljs.core.PersistentVector.EMP
 });
 reagent.core.render_component.call(null,new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [hello_world.core.dept_app], null),document.getElementById("app"));
 
-//# sourceMappingURL=core.js.map?rel=1434183447917
+//# sourceMappingURL=core.js.map?rel=1434193073414

@@ -12,6 +12,9 @@
             [app.routes-middleware :as m]
             [com.stuartsierra.component :as component]
             [app.service-handler :as ser]
+            [clj-http.client :as client]
+            [clojure.data.json :as json]
+            [base64-clj.core :as base64]
             [qrcode :as qr]))
 
 
@@ -66,14 +69,46 @@
              (resp/response))))))
 
 
+
+
 (defn main-routes [tie db]
   (routes
-    (GET "/" [:as {:keys [context]}] (resp/redirect (str context "/index.html")))
+    (GET "/" [state code :as {:keys [params]} ]
+      (if (nil? code)
+        (resp/response "access fail")
+        (do
+          (log/info "code= " code)
+          ;(log/info "state=" state)
+          (log/info "Callback return.... " params)
+          (try
+            (let [basic (base64/encode "CPocl5egXH1XQwV4XFGb5KGAVI5XihrmNC9ZKMm3Dyjc:Sl7mrzkzYprH7D5gdxiKyVMtyKF_xEtIOBsVsZ4VqbZ0")
+                  r {:form-params {"grant_type" "authorization_code"
+                                   "code"       code}
+                     ;:debug true
+                     ;:debug-body true
+                     :headers     {"Authorization: Basic" basic
+                                   "username"             "CPocl5egXH1XQwV4XFGb5KGAVI5XihrmNC9ZKMm3Dyjc"
+                                   "password"             "Sl7mrzkzYprH7D5gdxiKyVMtyKF_xEtIOBsVsZ4VqbZ0"}}
+                  v (-> (client/post "https://api.figo.me/auth/token" r)
+                        (:body)
+                        (json/read-str :key-fn keyword))]
+              (log/info "After get authentication key......... " v)
+              (resp/response v))
+            (catch Exception e
+              ;(clojure.pprint/pprint (.getMessage e))
+              (log/error e "System got Exception")
+              (resp/response "execption"))))))
+    (GET "/index" [:as {:keys [context params]}]
+      (do
+        (log/info "/" params)
+        (resp/redirect (str context "/index.html"))))
     (context "/query" [] (query-routes tie db))
     (context "/department" [] (department-routes tie db))
     (context "/status" [] (resp/response "Not implemented yet" ))
     (GET "/qrcode" [value] (qr/qr-response value))
-    (GET "/callback" [state] (resp/response {:state state} ) )
+
+    ;:basic-auth
+
     track-routes
     (route/resources "/")
     (route/not-found "Page not found")))
