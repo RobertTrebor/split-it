@@ -69,23 +69,16 @@
 
 
   (let [basic (base64/encode "CPocl5egXH1XQwV4XFGb5KGAVI5XihrmNC9ZKMm3Dyjc:Sl7mrzkzYprH7D5gdxiKyVMtyKF_xEtIOBsVsZ4VqbZ0")
-        r {:form-params {
-                         "grant_type" "password"
+        r {:form-params {"grant_type" "password"
                          "username" "mamuninfo@gmail.com"
-                         "password" "letmein"
-                         }
-           :debug true
-           :debug-body true
-           :headers {"Authorization: Basic " basic}
-           ;:accept       :json
-           }
+                         "password" "letmein"}
+           ;:debug true
+           ;:debug-body true
+           :headers {"Authorization: Basic " basic}}
         v (-> (client/post "https://api.figo.me/auth/token" r)
               (:body)
-              (json/read-str :key-fn keyword)
-              )]
-    (clojure.pprint/pprint v)
-
-    )
+              (json/read-str :key-fn keyword))]
+    (clojure.pprint/pprint v))
 
 
 

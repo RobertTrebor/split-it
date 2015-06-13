@@ -13,8 +13,7 @@
             [app.routes-middleware :as m]
             [com.stuartsierra.component :as component]
             [app.service-handler :as ser]
-            [clj-http.client :as client]
-            [clojure.data.json :as json]
+            [app.figoref :as figo]
             [base64-clj.core :as base64]
             [qrcode :as qr]))
 
@@ -71,61 +70,57 @@
 
 
 
-(comment
-  basic (base64/encode "CPocl5egXH1XQwV4XFGb5KGAVI5XihrmNC9ZKMm3Dyjc:Sl7mrzkzYprH7D5gdxiKyVMtyKF_xEtIOBsVsZ4VqbZ0")
-  r {:form-params {"grant_type" "authorization_code"
-                   "code"       code}
-     :headers     {"Authorization: Basic " basic
-                   "username"             "CPocl5egXH1XQwV4XFGb5KGAVI5XihrmNC9ZKMm3Dyjc"
-                   "password"             "Sl7mrzkzYprH7D5gdxiKyVMtyKF_xEtIOBsVsZ4VqbZ0"
-                   }}
-  )
-
-(defn call-figo [code]
-  (try
-    (let [basic (base64/encode "CPocl5egXH1XQwV4XFGb5KGAVI5XihrmNC9ZKMm3Dyjc:Sl7mrzkzYprH7D5gdxiKyVMtyKF_xEtIOBsVsZ4VqbZ0")
-          r {:form-params {"grant_type" "authorization_code"
-                           "code"       code}
-             :headers     {"Authorization: Basic " basic
-                           "username"             "CPocl5egXH1XQwV4XFGb5KGAVI5XihrmNC9ZKMm3Dyjc"
-                           "password"             "Sl7mrzkzYprH7D5gdxiKyVMtyKF_xEtIOBsVsZ4VqbZ0"
-                           }}
-          v (-> (client/post "https://api.figo.me/auth/token" r)
-                (:body)
-                (json/read-str :key-fn keyword))]
-      (clojure.pprint/pprint "Figo return..........."  v)
-      v)
-    (catch Exception e
-      (log/error e "System got Exception"))))
-
-
-
 (defn main-routes [tie db]
   (routes
-    (GET "/" [state code :as req ]
-      (log/info "Main route......." req)
-      (let [{:keys [context params session]} req ]
-        (log/info "----------------------")
-        (if (nil? code)
-          (resp/response "access fail")
-          (let [v (call-figo code)
-                session (assoc session :figo v)]
-            (-> req
-                (assoc :session  session)
-                (resp/response))))))
-    (GET "/index" [:as {:keys [context params ]}]
+    (GET "/" [state code :as {:keys [session]} ]
+      (if (nil? code)
+        (resp/response "access fail")
+        (let [{access_token :access_token :as v} (figo/get-access-token code)
+              session (-> session
+                          (assoc :figo-access-token v)
+                          (assoc :figo-session (figo/make-session access_token)))]
+          (log/info "Fego return " session)
+          {:status  302
+           :headers {"Location" "/index"}
+           :body    ""
+           :session session})))
+    (GET "/index" [:as {:keys [context params session]}]
       (do
+        (log/info session)
         (log/info "/" params)
         (resp/redirect (str context "/index.html"))))
     (GET "/sess" [:as {:keys [session]}]
       (resp/response session))
+    (GET "/testsess" [:as {:keys [session]}]
+      (let [count (or (:count session) 0)
+            session (assoc session :count (inc count))]
+        {:session session
+         :body count}))
+    (GET "/accounts" [:as {:keys [session]}]
+      (let [d (-> session
+                  (:figo-session)
+                  (figo/get-accounts))]
+        (resp/response d)))
+
+;    for (Transaction transaction : session.getTransactions(session.getAccount("A1.2"))) {
+ ;           System.out.println(transaction.getPurposeText());
+
+    (GET "/transaction" [accountId :as {:keys [session]}]
+      (let [d (->> session
+                  (:figo-session)
+                  (figo/get-transaction accountId))]
+        (resp/response d)))
+
+
+
     (context "/query" [] (query-routes tie db))
-    (context "/department" [] (department-routes tie db))
+;    (context "/department" [] (department-routes tie db))
+
+
     (context "/status" [] (resp/response "Not implemented yet" ))
     (GET "/qrcode" [value] (qr/qr-response value))
 
     ;:basic-auth
-
     track-routes
     (route/resources "/")
     (route/not-found "Page not found")))
@@ -140,12 +135,11 @@
               ;(res/wrap-resource "public")
               (m/wrap-request-log)
               (p/wrap-params)
-              (sess/wrap-session )
               (fp/wrap-restful-params)
               (fr/wrap-restful-response)
               (m/wrap-exceptions)
               (m/warp-allow-cross-origin)
-              )]
+              (sess/wrap-session ))]
       (assoc component :handler r)))
   (stop [component]
     (log/info "Stoping app routes.......")

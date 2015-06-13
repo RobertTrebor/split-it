@@ -30,7 +30,8 @@
                                [org.clojure/data.json "0.2.6"]
                                [ch.qos.logback/logback-classic "1.0.9"]
                                [base64-clj "0.1.1"]
-                               ])
+                               [me.figo/sdk "1.2.1"]
+                               [com.h2database/h2 "1.3.154"]])
 
             :plugins      [[lein-midje "3.0.0"]
                            [codox "0.6.4"]]
@@ -38,8 +39,12 @@
                            :output-dir "doc/api"}
 
             :repl-options {:port 4555}
+            :resource-paths ["web/resources/"
+                             "resources"]
             :profiles {
                        ;Example with immutant
+
+                       :profiles {:uberjar {:main main, :aot :all}}
 
                        :dev        {:resource-paths ["web/resources/"
                                                      "resources"]
