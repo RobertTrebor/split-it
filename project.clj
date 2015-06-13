@@ -29,11 +29,13 @@
                                [ch.qos.logback/logback-classic "1.0.9"]
                                [base64-clj "0.1.1"]
                                [me.figo/sdk "1.2.1"]
-                               [com.h2database/h2 "1.3.154"]])
+                               [com.h2database/h2 "1.3.154"]
+                               [environ "0.5.0"]])
 
             :plugins      [[lein-midje "3.0.0"]
                            [codox "0.6.4"]
-                           [lein-immutant "2.0.0-alpha1"]]
+                           [lein-immutant "2.0.0-alpha1"]
+                           [environ/environ.lein "0.2.1"]]
             :codox        {:sources    ["src"]
                            :output-dir "doc/api"}
 
