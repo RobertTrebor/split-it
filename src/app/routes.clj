@@ -75,7 +75,7 @@
     (GET "/" [state code :as {:keys [session]} ]
       (if (nil? code)
         (resp/response "access fail")
-        (let [{access_token :access_token :as v} (figo/get-access-token code)
+        (let [{access_token :access_token :as v} (figo/token-by-auth code)
               session (-> session
                           (assoc :figo-access-token v)
                           (assoc :figo-session (figo/make-session access_token)))]

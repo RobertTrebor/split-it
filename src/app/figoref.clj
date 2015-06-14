@@ -7,46 +7,80 @@
            [me.figo.models Account Transaction]))
 
 
-(defn get-access-token
-  [auth-code]
-  (try
-    (let [basic (base64/encode "CPocl5egXH1XQwV4XFGb5KGAVI5XihrmNC9ZKMm3Dyjc:Sl7mrzkzYprH7D5gdxiKyVMtyKF_xEtIOBsVsZ4VqbZ0")
-          r {:form-params {"grant_type" "authorization_code"
-                           "code"       auth-code}
-             :headers     {"Authorization: Basic " basic
-                           "username"             "CPocl5egXH1XQwV4XFGb5KGAVI5XihrmNC9ZKMm3Dyjc"
-                           "password"             "Sl7mrzkzYprH7D5gdxiKyVMtyKF_xEtIOBsVsZ4VqbZ0"
-                           }}
-          v (-> (client/post "https://api.figo.me/auth/token" r)
-                (:body)
-                (json/read-str :key-fn keyword))]
-      (log/info "Figo token value  ")
-      (clojure.pprint/pprint   v)
-      v)
-    (catch Exception e
-      (log/error e "System got Exception")
-      {})))
+(def ^:dynamic figo-api-end-point "https://api.figo.me/")
 
-(defn get-access-taken-by-user [username password]
-  (try
-    (let [basic (base64/encode "CPocl5egXH1XQwV4XFGb5KGAVI5XihrmNC9ZKMm3Dyjc:Sl7mrzkzYprH7D5gdxiKyVMtyKF_xEtIOBsVsZ4VqbZ0")
-          r {:form-params {"grant_type" "password"
-                           "username"   username            ;"mamuninfo@gmail.com"
-                           "password"   password            ;"letmein"
-                           }
-             ;:debug true
-             ;:debug-body true
-             :headers     {"Authorization: Basic " basic}}]
-      (-> (client/post "https://api.figo.me/auth/token" r)
-          (:body)
-          (json/read-str :key-fn keyword)))
-    (catch Exception e
-      (log/error e "System got Exception")
-      {})))
+
+(defn token-by-auth
+  [{:keys [auth-code client-id secret debug debug-body]}]
+  {:pre [(string? auth-code)
+         (string? client-id)
+         (string? secret)]}
+  (let [basic (base64/encode (str client-id ":" secret))
+        params {:form-params {"grant_type" "authorization_code"
+                              "code"       auth-code}
+                :headers     {"Authorization: Basic " basic
+                              "username"              client-id
+                              "password"              secret}}
+        params (if debug (assoc params :debug true) params)
+        params (if debug-body (assoc params :debug-body params) params)]
+    (-> (client/post (str figo-api-end-point "auth/token") params)
+        (:body)
+        (json/read-str :key-fn keyword))))
+
+
+(defn token-by-user
+  [{:keys [user-name password client-id secret debug debug-body]}]
+  {:pre [(string? user-name)
+         (string? password)
+         (string? client-id)
+         (string? secret)]}
+  (let [basic (base64/encode (str client-id ":" secret))
+        params {:form-params {"grant_type" "password"
+                              "username"   user-name
+                              "password"   password}
+                :headers     {"Authorization: Basic " basic}}
+        params (if debug (assoc params :debug true) params)
+        params (if debug-body (assoc params :debug-body params) params)]
+    (-> (client/post (str figo-api-end-point "auth/token") params)
+        (:body)
+        (json/read-str :key-fn keyword))))
+
+
+(defn accounts
+  [{:keys [access_token debug debug-body]}]
+  {:pre [(string? access_token)]}
+  (let [acc-token (str "Bearer " access_token)
+        params {:headers {"Authorization"  acc-token
+                          "Accept" "application/json"
+                          "Content-Type" "application/json"}}
+        params (if debug (assoc params :debug true) params)
+        params (if debug-body (assoc params :debug-body params) params)]
+    (-> (client/get (str figo-api-end-point "rest/accounts") params)
+        (:body)
+        (json/read-str :key-fn keyword))))
+
+
+
+
 
 (defn get-default-token []
-  (get-access-taken-by-user "mamuninfo@gmail.com" "letmein"))
+  (token-by-user {:client-id "CPocl5egXH1XQwV4XFGb5KGAVI5XihrmNC9ZKMm3Dyjc"
+                      :secret    "Sl7mrzkzYprH7D5gdxiKyVMtyKF_xEtIOBsVsZ4VqbZ0"
+                      :user-name  "mamuninfo@gmail.com"
+                      :password  "letmein"}))
 
+(->
+  (token-by-user {:client-id "CPocl5egXH1XQwV4XFGb5KGAVI5XihrmNC9ZKMm3Dyjc"
+                  :secret    "Sl7mrzkzYprH7D5gdxiKyVMtyKF_xEtIOBsVsZ4VqbZ0"
+                  :user-name "mamuninfo@gmail.com"
+                  :password  "letmein"})
+  ;(assoc          :debug true)
+  ;(assoc          :debug-body true)
+  (accounts)
+  (clojure.pprint/pprint))
+
+
+;(->> (accounts {}))
 
 (defn make-session [acc-token]
   (FigoSession. acc-token))
@@ -57,7 +91,7 @@
         (->> (.getAccounts f-session)
              (into [])
              (map bean)
-             (mapv #(select-keys % [:accountId :accountNumber :bankId :name :IBAN :currency :BIC :bankCode ] ))
+             (mapv #(select-keys % [:accountId :accountNumber :bankId :name :IBAN :currency :BIC :bankCode]))
              )]
     (log/info "Load account no.")
 
@@ -91,25 +125,24 @@
 
 
   (->>
-    (get-access-taken-by-user "mamuninfo@gmail.com" "letmein")
+    (token-by-user "mamuninfo@gmail.com" "letmein")
     (clojure.pprint/pprint))
 
 
-  (let [{access_token :access_token} (get-access-taken-by-user "mamuninfo@gmail.com" "letmein")]
+  (let [{access_token :access_token} (token-by-user "mamuninfo@gmail.com" "letmein")]
     (->>
       (make-session access_token)
-      (get-accounts )
+      (get-accounts)
       (clojure.pprint/pprint)))
 
 
-  (let [{access_token :access_token} (get-access-taken-by-user "mamuninfo@gmail.com" "letmein")
+  (let [{access_token :access_token} (token-by-user "mamuninfo@gmail.com" "letmein")
         sess (make-session access_token)
         accounts (get-accounts sess)
         f-account (get-in accounts [0 :accountId])]
     (->>
       (get-transaction sess f-account)
       (clojure.pprint/pprint)))
-
 
   )
 
