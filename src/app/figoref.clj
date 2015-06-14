@@ -60,6 +60,19 @@
         (json/read-str :key-fn keyword))))
 
 
+(defn account-by-id
+  [{:keys [access_token debug debug-body account_id]}]
+  {:pre [(string? access_token)
+         (string? account_id)]}
+  (let [acc-token (str "Bearer " access_token)
+        params {:headers {"Authorization"  acc-token
+                          "Accept" "application/json"
+                          "Content-Type" "application/json"}}
+        params (if debug (assoc params :debug true) params)
+        params (if debug-body (assoc params :debug-body params) params)]
+    (-> (client/get (str figo-api-end-point "rest/accounts/" account_id) params)
+        (:body)
+        (json/read-str :key-fn keyword))))
 
 
 
@@ -78,6 +91,26 @@
   ;(assoc          :debug-body true)
   (accounts)
   (clojure.pprint/pprint))
+
+
+(let [v
+      (->
+        (token-by-user {:client-id "CPocl5egXH1XQwV4XFGb5KGAVI5XihrmNC9ZKMm3Dyjc"
+                        :secret    "Sl7mrzkzYprH7D5gdxiKyVMtyKF_xEtIOBsVsZ4VqbZ0"
+                        :user-name "mamuninfo@gmail.com"
+                        :password  "letmein"})
+        ;(assoc          :debug true)
+        ;(assoc          :debug-body true)
+
+        )
+      accounts (accounts v)
+      faccount (get-in accounts [:accounts 0 :account_id])]
+
+  (->>
+    (account-by-id (assoc v :account_id faccount))
+    (clojure.pprint/pprint))
+  ;faccount
+  )
 
 
 ;(->> (accounts {}))
