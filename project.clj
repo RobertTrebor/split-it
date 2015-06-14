@@ -40,7 +40,7 @@
                            :output-dir "doc/api"}
 
             :min-lein-version "2.0.0"
- ;           :repl-options {:port 4555}
+            :repl-options {:port 4555}
             :source-paths ["src"
                            "module/tie/src/clj"]
             :test-paths ["test"]
